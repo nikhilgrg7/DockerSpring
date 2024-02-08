@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.ia</groupId>
-	<artifactId>SpringBootDemoAtc</artifactId>
+	<artifactId>docker-jenkins-integration-sample</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>SpringBootDemoAtc</name>
+	<name>docker-jenkins-integration-sample</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>
@@ -52,5 +52,8 @@
 			</plugin>
 		</plugins>
 	</build>
+	<build>
+    <finalName>docker-jenkins-integration-sample</finalName>
+</build>
 
 </project>
