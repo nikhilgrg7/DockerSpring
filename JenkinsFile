@@ -1,5 +1,8 @@
 pipeline {
     agent any
+environment {
+        PATH = "/usr/bin/docker:${env.PATH}"
+    }
     tools{
         maven 'maven'
     }
