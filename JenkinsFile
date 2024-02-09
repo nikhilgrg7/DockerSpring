@@ -1,0 +1,29 @@
+pipeline{
+    agent any
+    tools{
+        maven'maven'
+    }
+    stages{
+        stage('Build maven'){
+            steps{
+               checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: '24139d2f-eb85-495a-8748-7257fe16b66b', url: 'https://github.com/nikhilgrg7/DockerSpring.git']])
+               bat 'mvn clean install'
+            }
+        }
+        stage('Build docker image'){
+            steps{
+                script{
+                    bat 'wsl docker build -t nikhil/docker-jenkins-integration-sample .'
+                }
+            }
+        }
+        stage('Run container'){
+            steps{
+                script{
+                    bat 'wsl docker run -d -p 8080:8080 nikhil/docker-jenkins-integration-sample'
+                }
+            }
+        }
+    }
+    
+}
