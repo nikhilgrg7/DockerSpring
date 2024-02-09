@@ -1,5 +1,12 @@
 pipeline {
     agent any
+ agent {
+        label 'my-wsl-agent'
+    }
+
+    environment {
+        DOCKER_PATH = "/usr/bin:${env.PATH}"
+    }
     tools{
         maven 'maven'
     }
