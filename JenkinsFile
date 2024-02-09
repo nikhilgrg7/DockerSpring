@@ -1,53 +1,28 @@
 pipeline {
     agent any
-    
-    environment {
-        DOCKER_IMAGE = 'spring-boot-app'
-        DOCKER_REGISTRY_CREDENTIALS = 'docker-hub-credentials'
+    tools{
+        maven 'maven'
     }
-    
     stages {
-        stage('Checkout') {
+        stage('Build Maven') {
             steps {
-                checkout scm
-            }
-         stage('Build maven'){
-            steps{
-               checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: '24139d2f-eb85-495a-8748-7257fe16b66b', url: 'https://github.com/nikhilgrg7/DockerSpring.git']])
-               bat 'mvn clean install'
-            }
-        }
+                    checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: '24139d2f-eb85-495a-8748-7257fe16b66b', url: 'https://github.com/nikhilgrg7/DockerSpring.git']])
+                    bat 'mvn clean install'
+               }
 }
-        
-        stage('Build') {
-            steps {
-                script {
-                    bat './mvnw clean package -DskipTests=true'
-                    docker.build(env.DOCKER_IMAGE)
+        stage('Build Docker Image'){
+            steps{
+                script{
+                        bat 'docker build -t nikhilgrg7884/docker-jenkins-integration-sample'
+                    }
                 }
-            }
         }
-        
-        stage('Test') {
-            steps {
-                script {
-                    bat './mvnw test'
-                }
-            }
-        }
-        
-        stage('Deploy') {
-            steps {
-                script {
-                    withCredentials([usernamePassword(credentialsId: env.DOCKER_REGISTRY_CREDENTIALS, usernameVariable: 'nikhilgrg7884', passwordVariable: 'Nikhil@07')]) {
-                        docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                            bat "docker login -u $nikhilgrg7884 -p $Nikhil@07"
-                            bat "docker tag ${env.DOCKER_IMAGE}:latest ${env.nikhilgrg7884}/${env.DOCKER_IMAGE}:latest"
-                            bat "docker push ${env.nikhilgrg7884}/${env.DOCKER_IMAGE}:latest"
-                        }
+        stage('Run container'){
+            steps{
+                script{
+                        bat 'docker run -d -p nikhilgrg7884/docker-jenkins-integration-sample'
                     }
                 }
             }
-        }
     }
 }
