@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        label 'my-wsl-agent'
-    }
+    agent any
 
     environment {
         DOCKER_PATH = "/usr/bin:${env.PATH}"
