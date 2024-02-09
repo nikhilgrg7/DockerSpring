@@ -1,29 +1,52 @@
-pipeline{
+pipeline {
     agent any
-    tools{
-        maven'maven'
+    
+    environment {
+        DOCKER_IMAGE = 'spring-boot-app'
+        DOCKER_REGISTRY_CREDENTIALS = 'docker-hub-credentials'
     }
-    stages{
-        stage('Build maven'){
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+         stage('Build maven'){
             steps{
                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[credentialsId: '24139d2f-eb85-495a-8748-7257fe16b66b', url: 'https://github.com/nikhilgrg7/DockerSpring.git']])
                bat 'mvn clean install'
             }
         }
-        stage('Build docker image'){
-            steps{
-                script{
-                    bat 'wsl docker build -t nikhil/docker-jenkins-integration-sample .'
+        
+        stage('Build') {
+            steps {
+                script {
+                    bat './mvnw clean package -DskipTests=true'
+                    docker.build(env.DOCKER_IMAGE)
                 }
             }
         }
-        stage('Run container'){
-            steps{
-                script{
-                    bat 'wsl docker run -d -p 8080:8080 nikhil/docker-jenkins-integration-sample'
+        
+        stage('Test') {
+            steps {
+                script {
+                    bat './mvnw test'
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: env.DOCKER_REGISTRY_CREDENTIALS, usernameVariable: 'nikhilgrg7884', passwordVariable: 'Nikhil@07')]) {
+                        docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+                            bat "docker login -u $nikhilgrg7884 -p $Nikhil@07"
+                            bat "docker tag ${env.DOCKER_IMAGE}:latest ${env.nikhilgrg7884}/${env.DOCKER_IMAGE}:latest"
+                            bat "docker push ${env.nikhilgrg7884}/${env.DOCKER_IMAGE}:latest"
+                        }
+                    }
                 }
             }
         }
     }
-    
 }
