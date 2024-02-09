@@ -13,14 +13,14 @@ pipeline{
         stage('Build docker image'){
             steps{
                 script{
-                    bat 'wsl docker build -t nikhil/docker-jenkins-integration-sample .'
+                    bat 'wsl docker build -t nikhilgrg7884/docker-jenkins-integration-sample .'
                 }
             }
         }
         stage('Run container'){
             steps{
                 script{
-                    bat 'wsl docker run -d -p 8080:8080 nikhil/docker-jenkins-integration-sample'
+                    bat 'wsl docker run -d -p 8080:8080 nikhilgrg7884/docker-jenkins-integration-sample'
                 }
             }
         }
